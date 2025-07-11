@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  client
+  freelancer
+  admin
+}
+
+enum JobStatus {
+  open
+  close
+}
+
+enum BidStatus {
+  accepted
+  rejected
+  pending
+}
+
+enum TransactionType {
+  debit
+  credit
+  refund
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  username    String
+  firstName   String?
+  lastName    String?
+  role        Role          @default(freelancer)
+  banned      Boolean?      @default(false)
+  createdAt   DateTime      @default(now())
+  bids        Bid[]
+  walletId    Int
+  Wallet      Wallet?
+  Transaction Transaction[]
+}
+
+model Bid {
+  id     Int       @id @default(autoincrement())
+  budget Decimal   @default(0.00)
+  userId Int
+  user   User      @relation(fields: [userId], references: [id])
+  status BidStatus @default(pending)
+  jobId  Int
+
+  job Job @relation(fields: [jobId], references: [id])
+}
+
+model Job {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  budget      Decimal   @default(0.00)
+  deadline    DateTime
+  status      JobStatus @default(open)
+  bids        Bid[]
+}
+
+model Wallet {
+  id      Int     @id @default(autoincrement())
+  balance Decimal @default(0.00)
+  userId  Int     @unique
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id        Int             @id @default(autoincrement())
+  amount    Decimal         @default(0.00)
+  userId    Int
+  user      User            @relation(fields: [userId], references: [id])
+  type      TransactionType @default(debit)
+  createdAt DateTime        @default(now())
+}

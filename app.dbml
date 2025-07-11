@@ -1,0 +1,65 @@
+Enum Role {
+  client
+  freelancer
+  admin
+}
+
+Enum JobStatus {
+  open
+  close
+}
+
+Enum BidStatus {
+  accepted
+  rejected
+  pending
+}
+
+Enum TransactionType {
+  debit
+  credit
+  refund
+}
+
+Table user {
+  id int [pk, increment]
+  email text [not null, unique]
+  username varchar(30) [not null]
+  firstName varchar(50)
+  lastName varchar(50)
+  role Role [not null, default: "freelancer"]
+  banned bool [default: false]
+  createdAt datetime
+}
+
+Table bid {
+  id int [pk, increment]
+  budget int [not null, default: 0]
+  user_id int [ref: > user.id]
+  job_id int [ref: > job.id]
+  status BidStatus [not null, default: "pending"]
+}
+
+Table job {
+  id int [pk, increment]
+  title varchar(250) [not null]
+  description text [not null]
+  skills "varchar[]"
+  budget int
+  deadline datetime
+  status JobStatus [default: "open"]
+}
+
+Table wallet {
+  id int [pk, increment]
+  user_id int [ref: - user.id]
+  balance int [not null, default: 0]
+}
+
+Table transaction {
+  id int [pk, increment]
+  amount int [not null]
+  user_id int [ref: > user.id]
+  type TransactionType [not null, default: "debit"]
+  createdAt timestamp [not null]
+}
