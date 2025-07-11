@@ -1,6 +1,9 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { VersioningType } from "@nestjs/common";
+import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
+import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
+import { ValidationPipe } from "./common/pipes/validation.pipe";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,6 +11,10 @@ async function bootstrap() {
   // ==== Configurations
 
   app.setGlobalPrefix("api");
+
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalPipes(new ValidationPipe());
 
   app.enableVersioning({
     type: VersioningType.URI,
