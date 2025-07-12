@@ -58,9 +58,16 @@ export class JobController {
     });
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.client)
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateJobDto: UpdateJobDto) {
-    return this.jobService.update(+id, updateJobDto);
+  async update(@Param("id") id: string, @Body() updateJobDto: UpdateJobDto) {
+    const data = await this.jobService.update(+id, updateJobDto);
+
+    return SuccessResponse({
+      message: "Job updated successfully",
+      data,
+    });
   }
 
   @Delete(":id")

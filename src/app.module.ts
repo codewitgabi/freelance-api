@@ -4,6 +4,7 @@ import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
 import { JobModule } from "./job/job.module";
 import { PrismaModule } from "./prisma/prisma.module";
+import { CaslModule } from "./casl/casl.module";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     AuthModule,
     JobModule,
     PrismaModule,
+    CaslModule,
   ],
   controllers: [],
   providers: [],
