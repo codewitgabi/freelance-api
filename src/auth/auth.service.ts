@@ -5,6 +5,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { AuthUserEntity } from "./entities/auth-user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { plainToInstance } from "class-transformer";
+import { LoginUserDto } from "./dto/login-user.dto";
 
 @Injectable()
 export class AuthService {
@@ -56,6 +57,45 @@ export class AuthService {
     // === End transaction
 
     const serializedUser = plainToInstance(AuthUserEntity, newUser, {
+      excludeExtraneousValues: true,
+    });
+
+    // Generate user access token
+
+    const payload = {
+      sub: serializedUser.id,
+      username: serializedUser.username,
+    };
+
+    const accessToken = await this.generateAccessToken(payload);
+
+    return { accessToken, user: serializedUser };
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    // Get request data
+
+    const { email, password } = loginUserDto;
+
+    // Check if there is a user associated with the email
+
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new BadRequestException("User with email does not exist");
+    }
+
+    // Verify the password
+
+    const matchPassword = bcrypt.compareSync(password, user.password);
+
+    if (!matchPassword) {
+      throw new BadRequestException("Incorrect password");
+    }
+
+    const serializedUser = plainToInstance(AuthUserEntity, user, {
       excludeExtraneousValues: true,
     });
 
