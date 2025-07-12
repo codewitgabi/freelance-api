@@ -4,6 +4,8 @@ import {
   Body,
   UseInterceptors,
   ClassSerializerInterceptor,
+  HttpCode,
+  HttpStatus,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterUserDto } from "./dto/register-user.dto";
@@ -25,6 +27,7 @@ export class AuthController {
     });
   }
 
+  @HttpCode(HttpStatus.OK)
   @Post("login")
   async login(@Body() loginUserDto: LoginUserDto) {
     const data = await this.authService.login(loginUserDto);

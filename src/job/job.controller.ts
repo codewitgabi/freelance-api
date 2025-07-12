@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from "@nestjs/common";
 import { JobService } from "./job.service";
 import { CreateJobDto } from "./dto/create-job.dto";
@@ -21,6 +23,7 @@ import SuccessResponse from "src/common/responses/success-response";
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
+  @HttpCode(HttpStatus.OK)
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.client)
