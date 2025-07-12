@@ -7,8 +7,12 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class JobService {
   constructor(private prisma: PrismaService) {}
 
-  create(createJobDto: CreateJobDto) {
-    return createJobDto;
+  async create(createJobDto: CreateJobDto) {
+    const job = await this.prisma.job.create({
+      data: createJobDto,
+    });
+
+    return job;
   }
 
   findAll() {

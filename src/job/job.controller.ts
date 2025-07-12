@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
 } from "@nestjs/common";
 import { JobService } from "./job.service";
 import { CreateJobDto } from "./dto/create-job.dto";
@@ -16,6 +15,7 @@ import { Roles } from "src/common/decorators/role.decorator";
 import { Role } from "@prisma/client";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { AuthGuard } from "src/common/guards/auth.guard";
+import SuccessResponse from "src/common/responses/success-response";
 
 @Controller("job")
 export class JobController {
@@ -24,8 +24,13 @@ export class JobController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.client)
-  create(@Body() createJobDto: CreateJobDto) {
-    return this.jobService.create(createJobDto);
+  async create(@Body() createJobDto: CreateJobDto) {
+    const data = await this.jobService.create(createJobDto);
+
+    return SuccessResponse({
+      message: "Job created successfully",
+      data,
+    });
   }
 
   @Get()
