@@ -37,8 +37,15 @@ export class JobService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} job`;
+  async findOne(id: number) {
+    const job = await this.prisma.job.findFirst({
+      where: { id },
+      include: {
+        bids: true,
+      },
+    });
+
+    return job;
   }
 
   update(id: number, updateJobDto: UpdateJobDto) {

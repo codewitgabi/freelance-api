@@ -49,8 +49,13 @@ export class JobController {
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.jobService.findOne(+id);
+  async findOne(@Param("id") id: string) {
+    const data = await this.jobService.findOne(+id);
+
+    return SuccessResponse({
+      message: "Job fetched successfully",
+      data,
+    });
   }
 
   @Patch(":id")
