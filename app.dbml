@@ -25,6 +25,7 @@ Table user {
   id int [pk, increment]
   email text [not null, unique]
   username varchar(30) [not null]
+  password text [not null]
   firstName varchar(50)
   lastName varchar(50)
   role Role [not null, default: "freelancer"]

@@ -38,6 +38,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
     }
 
+    if (process.env.NODE_ENV === "development") {
+      console.log(exception);
+    }
+
     const body = {
       status: "error",
       statusCode,

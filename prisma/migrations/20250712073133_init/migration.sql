@@ -15,12 +15,12 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "firstName" TEXT,
     "lastName" TEXT,
     "role" "Role" NOT NULL DEFAULT 'freelancer',
     "banned" BOOLEAN DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "walletId" INTEGER NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
