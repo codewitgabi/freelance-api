@@ -17,7 +17,7 @@ export class AuthService {
   async create(registerUserDto: RegisterUserDto) {
     // Extract data from request
 
-    const { username, email, password } = registerUserDto;
+    const { username, email, password, role } = registerUserDto;
 
     // Check if user with email already exists
 
@@ -43,6 +43,7 @@ export class AuthService {
           username,
           email,
           password: hashedPassword,
+          role,
           wallet: {
             create: {
               balance: 0.0,

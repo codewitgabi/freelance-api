@@ -3,7 +3,13 @@ import {
   IsString,
   MaxLength,
   IsStrongPassword,
+  IsEnum,
 } from "class-validator";
+
+enum NonAdminRole {
+  client = "client",
+  freelancer = "freelancer",
+}
 
 export class RegisterUserDto {
   @IsString()
@@ -21,4 +27,7 @@ export class RegisterUserDto {
     minNumbers: 1,
   })
   password: string;
+
+  @IsEnum(NonAdminRole, { message: "Role must be either client or freelancer" })
+  role: NonAdminRole;
 }
