@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from "@nestjs/common";
 import { JobService } from "./job.service";
 import { CreateJobDto } from "./dto/create-job.dto";
@@ -18,8 +19,9 @@ import { Role } from "@prisma/client";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import SuccessResponse from "src/common/responses/success-response";
+import { PaginationQueryDto } from "src/common/pagination-query.dto";
 
-@Controller("job")
+@Controller("jobs")
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
@@ -37,8 +39,13 @@ export class JobController {
   }
 
   @Get()
-  findAll() {
-    return this.jobService.findAll();
+  async findAll(@Query() paginationQuery: PaginationQueryDto) {
+    const data = await this.jobService.findAll(paginationQuery);
+
+    return SuccessResponse({
+      message: "Jobs fetched successfully",
+      data,
+    });
   }
 
   @Get(":id")

@@ -44,7 +44,7 @@ model User {
   firstName   String?
   lastName    String?
   role        Role          @default(freelancer)
-  banned      Boolean      @default(false)
+  banned      Boolean       @default(false)
   createdAt   DateTime      @default(now())
   bids        Bid[]
   transaction Transaction[]
@@ -71,6 +71,8 @@ model Job {
   deadline    DateTime
   status      JobStatus @default(open)
   bids        Bid[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Wallet {

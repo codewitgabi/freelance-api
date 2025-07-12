@@ -19,7 +19,7 @@ CREATE TABLE "User" (
     "firstName" TEXT,
     "lastName" TEXT,
     "role" "Role" NOT NULL DEFAULT 'freelancer',
-    "banned" BOOLEAN DEFAULT false,
+    "banned" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -44,6 +44,8 @@ CREATE TABLE "Job" (
     "budget" DECIMAL(65,30) NOT NULL DEFAULT 0.00,
     "deadline" TIMESTAMP(3) NOT NULL,
     "status" "JobStatus" NOT NULL DEFAULT 'open',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Job_pkey" PRIMARY KEY ("id")
 );
