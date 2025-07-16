@@ -1,4 +1,4 @@
-import { Transform, Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 import { Decimal } from "@prisma/client/runtime/library";
 
 export class WalletEntity {
@@ -6,11 +6,11 @@ export class WalletEntity {
   id: number;
 
   @Expose()
-  @Transform(({ value }) => (value as Decimal).toString())
+  @Transform(({ value }: { value: Decimal }) => {
+    console.log(value);
+    return value ? value.toString() : "0.00";
+  })
   balance: string;
-
-  @Expose()
-  userId: number;
 
   constructor(partial: Partial<WalletEntity>) {
     Object.assign(this, partial);

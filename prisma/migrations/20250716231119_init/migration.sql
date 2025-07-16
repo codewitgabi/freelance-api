@@ -11,33 +11,34 @@ CREATE TYPE "BidStatus" AS ENUM ('accepted', 'rejected', 'pending');
 CREATE TYPE "TransactionType" AS ENUM ('debit', 'credit', 'refund');
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "username" VARCHAR(30) NOT NULL,
     "password" TEXT NOT NULL,
-    "firstName" TEXT,
-    "lastName" TEXT,
+    "firstName" VARCHAR(50),
+    "lastName" VARCHAR(50),
     "role" "Role" NOT NULL DEFAULT 'freelancer',
     "banned" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "walletId" INTEGER NOT NULL,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Bid" (
+CREATE TABLE "bids" (
     "id" SERIAL NOT NULL,
     "budget" DECIMAL(65,30) NOT NULL DEFAULT 0.00,
     "userId" INTEGER NOT NULL,
     "status" "BidStatus" NOT NULL DEFAULT 'pending',
     "jobId" INTEGER NOT NULL,
 
-    CONSTRAINT "Bid_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "bids_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Job" (
+CREATE TABLE "jobs" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -48,46 +49,45 @@ CREATE TABLE "Job" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Job_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "jobs_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Wallet" (
+CREATE TABLE "wallets" (
     "id" SERIAL NOT NULL,
-    "balance" DECIMAL(65,30) NOT NULL DEFAULT 0.00,
-    "userId" INTEGER NOT NULL,
+    "balance" DECIMAL(12,2) NOT NULL DEFAULT 0.00,
 
-    CONSTRAINT "Wallet_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "wallets_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Transaction" (
+CREATE TABLE "transactions" (
     "id" SERIAL NOT NULL,
     "amount" DECIMAL(65,30) NOT NULL DEFAULT 0.00,
     "userId" INTEGER NOT NULL,
     "type" "TransactionType" NOT NULL DEFAULT 'debit',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "transactions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Wallet_userId_key" ON "Wallet"("userId");
+CREATE UNIQUE INDEX "users_walletId_key" ON "users"("walletId");
 
 -- AddForeignKey
-ALTER TABLE "Bid" ADD CONSTRAINT "Bid_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users" ADD CONSTRAINT "users_walletId_fkey" FOREIGN KEY ("walletId") REFERENCES "wallets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bid" ADD CONSTRAINT "Bid_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "bids" ADD CONSTRAINT "bids_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Job" ADD CONSTRAINT "Job_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "bids" ADD CONSTRAINT "bids_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "jobs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Wallet" ADD CONSTRAINT "Wallet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
