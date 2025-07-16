@@ -3,7 +3,7 @@ function SuccessResponse({
   data,
 }: {
   message: string;
-  data: unknown;
+  data?: unknown;
 }) {
   return {
     message,

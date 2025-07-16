@@ -65,7 +65,7 @@ export class JobService {
       throw new NotFoundException("Job not found");
     }
 
-    if (user.id != existingJob.userId) {
+    if (user.id !== existingJob.userId) {
       throw new ForbiddenException("Permission denied");
     }
 
@@ -77,7 +77,21 @@ export class JobService {
     return job;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} job`;
+  async delete(id: number, user: User) {
+    // Get user with given id
+
+    const job = await this.prisma.job.findFirst({ where: { id } });
+
+    if (!job) {
+      throw new NotFoundException("Job not found");
+    }
+
+    // Check ownership
+
+    if (user.id !== job.userId) {
+      throw new ForbiddenException("Permission denied");
+    }
+
+    await this.prisma.job.delete({ where: { id } });
   }
 }

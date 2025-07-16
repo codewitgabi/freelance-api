@@ -80,8 +80,15 @@ export class JobController {
     });
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.client)
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.jobService.remove(+id);
+  async delete(@Param("id") id: string, @CurrentUser() user: User) {
+    await this.jobService.delete(+id, user);
+
+    return SuccessResponse({
+      message: "Job deleted successfully",
+    });
   }
 }
