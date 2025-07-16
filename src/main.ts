@@ -4,10 +4,10 @@ import { VersioningType } from "@nestjs/common";
 import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 import { ValidationPipe } from "./common/pipes/validation.pipe";
+import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   // ==== Configurations
 
   app.setGlobalPrefix("api");
@@ -22,6 +22,12 @@ async function bootstrap() {
   });
 
   // ==== End configurations
+
+  // === Middlewares
+
+  app.use(new LoggerMiddleware().use.bind(new LoggerMiddleware()));
+
+  // === End middlewares
 
   await app.listen(process.env.PORT ?? 3000);
 }
