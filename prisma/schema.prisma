@@ -48,6 +48,7 @@ model User {
   createdAt   DateTime      @default(now())
   bids        Bid[]
   transaction Transaction[]
+  jobs        Job[]
 
   wallet Wallet? @relation("UserWallet")
 }
@@ -70,6 +71,8 @@ model Job {
   budget      Decimal   @default(0.00)
   deadline    DateTime
   status      JobStatus @default(open)
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
   bids        Bid[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

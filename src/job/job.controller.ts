@@ -20,17 +20,23 @@ import { RolesGuard } from "src/common/guards/roles.guard";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import SuccessResponse from "src/common/responses/success-response";
 import { PaginationQueryDto } from "src/common/pagination-query.dto";
+import { CaslAbilityFactory } from "src/casl/casl-ability.factory/casl-ability.factory";
+import { User } from "@prisma/client";
+import { CurrentUser } from "src/common/decorators/current-user.decorator";
 
 @Controller("jobs")
 export class JobController {
-  constructor(private readonly jobService: JobService) {}
+  constructor(
+    private readonly jobService: JobService,
+    private caslAbilityFactory: CaslAbilityFactory,
+  ) {}
 
   @HttpCode(HttpStatus.OK)
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.client)
-  async create(@Body() createJobDto: CreateJobDto) {
-    const data = await this.jobService.create(createJobDto);
+  async create(@Body() createJobDto: CreateJobDto, @CurrentUser() user: User) {
+    const data = await this.jobService.create(createJobDto, user.id);
 
     return SuccessResponse({
       message: "Job created successfully",
@@ -61,8 +67,12 @@ export class JobController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.client)
   @Patch(":id")
-  async update(@Param("id") id: string, @Body() updateJobDto: UpdateJobDto) {
-    const data = await this.jobService.update(+id, updateJobDto);
+  async update(
+    @Param("id") id: string,
+    @Body() updateJobDto: UpdateJobDto,
+    @CurrentUser() user: User,
+  ) {
+    const data = await this.jobService.update(+id, updateJobDto, user);
 
     return SuccessResponse({
       message: "Job updated successfully",

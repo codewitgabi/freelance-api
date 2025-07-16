@@ -8,21 +8,12 @@ import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import { jwtConstants } from "src/auth/constants";
 import { PrismaService } from "src/prisma/prisma.service";
-import { TUser } from "../types/user.types";
 
 // Define the JWT payload interface
 
 interface JwtPayload {
   sub: number;
   email: string;
-}
-
-// Extend the Request interface to include the user property
-
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: TUser;
-  }
 }
 
 @Injectable()
