@@ -10,6 +10,7 @@ import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { plainToInstance } from "class-transformer";
 import { BidEntity } from "./entities/bid.entity";
+import { AcceptOrDeclineBidDto } from "./dto/accept-or-decline-bid.dto";
 
 @Injectable()
 export class BidService {
@@ -233,5 +234,81 @@ export class BidService {
     await this.prisma.bid.delete({ where: { id } });
 
     this.logger.log("Bid deletion process completed successfully");
+  }
+
+  async acceptOrDeclineBid(
+    id: number,
+    user: User,
+    acceptOrDeclineBidDto: AcceptOrDeclineBidDto,
+  ) {
+    const { action } = acceptOrDeclineBidDto;
+
+    this.logger.log("Begin process to accept or decline bid", {
+      id,
+      userId: user.id,
+    });
+
+    // Check if bid exists
+
+    this.logger.log("Checking if bid exists");
+
+    const existingBid = await this.prisma.bid.findUnique({
+      where: { id },
+      include: { job: true },
+    });
+
+    if (!existingBid) {
+      this.logger.error("Bid does not exist");
+
+      throw new NotFoundException("Bid not found");
+    }
+
+    this.logger.log("Bid retrieved successfully");
+
+    // Check if user has permission to perform action
+
+    this.logger.log("Checking if user has permission to perform action");
+
+    if (existingBid.job.userId !== user.id) {
+      this.logger.error("User does not have permission to perform action");
+
+      throw new ForbiddenException("Permission denied");
+    }
+
+    this.logger.log("User has permission to perform action");
+
+    // Perform action
+
+    this.logger.log("Performing action on bid");
+
+    switch (action) {
+      case "accept":
+        this.logger.log("Accepting bid");
+
+        await this.prisma.bid.update({
+          where: { id },
+          data: {
+            status: "accepted",
+          },
+        });
+
+        this.logger.log("Bid accepted successfully");
+        break;
+
+      case "reject":
+        this.logger.log("Rejecting bid");
+
+        await this.prisma.bid.update({
+          where: { id },
+          data: {
+            status: "rejected",
+          },
+        });
+
+        this.logger.log("Bid rejected successfully");
+        break;
+    }
+
+    this.logger.log("Action performed successfully");
   }
 }
