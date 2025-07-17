@@ -152,8 +152,37 @@ export class BidService {
     return bid;
   }
 
-  update(id: number, updateBidDto: UpdateBidDto) {
-    return `This action updates a #${id} bid`;
+  async update(id: number, updateBidDto: UpdateBidDto, user: User) {
+    this.logger.log("Begin updating bid", { id, userId: user.id });
+
+    // Check if bid with id exists in database
+
+    this.logger.log("Checking if bid with id exists");
+
+    const bid = await this.prisma.bid.findUnique({
+      where: { id, userId: user.id },
+    });
+
+    if (!bid) {
+      this.logger.error("Bid not found", { id });
+
+      throw new NotFoundException("Bid not found");
+    }
+
+    this.logger.log("Bid with id found");
+
+    // Update bid
+
+    this.logger.log("Updating bid");
+
+    const updatedBid = await this.prisma.bid.update({
+      where: { id, userId: user.id },
+      data: updateBidDto,
+    });
+
+    this.logger.log("Bid updated successfully");
+
+    return updatedBid;
   }
 
   remove(id: number) {

@@ -1,4 +1,4 @@
-import { IsNumber, IsPositive } from "class-validator";
+import { IsNumber, IsPositive, IsString, IsOptional } from "class-validator";
 
 export class CreateBidDto {
   @IsNumber(
@@ -7,4 +7,8 @@ export class CreateBidDto {
   )
   @IsPositive({ message: "Budget must be greater than zero" })
   budget: number;
+
+  @IsOptional()
+  @IsString()
+  description: string;
 }

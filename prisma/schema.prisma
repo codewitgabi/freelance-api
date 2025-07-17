@@ -51,12 +51,13 @@ model User {
 }
 
 model Bid {
-  id     Int       @id @default(autoincrement())
-  budget Decimal   @default(0.00)
-  userId Int
-  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  status BidStatus @default(pending)
-  jobId  Int
+  id          Int       @id @default(autoincrement())
+  budget      Decimal   @default(0.00)
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  status      BidStatus @default(pending)
+  description String?
+  jobId       Int
 
   job Job @relation(fields: [jobId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
