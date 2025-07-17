@@ -118,4 +118,18 @@ export class JobController {
 
     return SuccessResponse({ message: "Bids fetched successfully", data });
   }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.client, Role.admin)
+  @Get(":id/bids/:bidId")
+  async getBid(
+    @Param("id") id: string,
+    @Param("bidId") bidId: string,
+    @CurrentUser() user: User,
+  ) {
+    const data = await this.bidService.findOne(+id, +bidId, user);
+
+    return SuccessResponse({ message: "Bids fetched successfully", data });
+  }
 }

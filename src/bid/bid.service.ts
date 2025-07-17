@@ -119,8 +119,37 @@ export class BidService {
     return serializedBids;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bid`;
+  async findOne(id: number, jobId: number, user: User) {
+    this.logger.log("Begin finding bid", { id, jobId });
+
+    // Retrieve bid from database
+
+    const bid = await this.prisma.bid.findUnique({
+      where: { id, jobId },
+      include: { job: true },
+    });
+
+    if (!bid) {
+      this.logger.error("Bid not found", { id });
+
+      throw new NotFoundException("Bid not found");
+    }
+
+    this.logger.log("Bid retrieved successfully");
+
+    // Check if user has permission to view bid
+
+    this.logger.log("Checking if user has permission to view bid");
+
+    if (bid.job.userId !== user.id) {
+      this.logger.error("User does not have the permission to view bid");
+
+      throw new ForbiddenException("Permission denied");
+    }
+
+    this.logger.log("User has permission to view bid");
+
+    return bid;
   }
 
   update(id: number, updateBidDto: UpdateBidDto) {
