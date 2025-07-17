@@ -1,16 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-// import { UpdateUserDto } from "./dto/update-user.dto";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { plainToInstance } from "class-transformer";
 import { UserEntity } from "./entities/user.entity";
-// import { $Enums } from "@prisma/client";
-// import { Decimal } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name, { timestamp: true });
+
   constructor(private prisma: PrismaService) {}
 
   async findOne(id: number) {
+    this.logger.log("Checking if there is a user with the specified id", {
+      id,
+    });
     // Get user matching the given id
 
     const user = await this.prisma.user.findUnique({
@@ -22,16 +24,17 @@ export class UserService {
       },
     });
 
+    this.logger.log("Check completed");
+
     if (!user) {
+      this.logger.error("User not found with given id", { id });
+
       throw new NotFoundException("User not found");
     }
 
-    console.log({ user });
-    console.log(
-      "Raw wallet balance:",
-      user.wallet?.balance.toFixed(2),
-      typeof user.wallet?.balance.toFixed(2),
-    );
+    this.logger.log("Found user with given id", { id });
+
+    this.logger.log("Serializing user data");
 
     const transformedUser = {
       ...user,
@@ -44,6 +47,8 @@ export class UserService {
     const serializedUser = plainToInstance(UserEntity, transformedUser, {
       excludeExtraneousValues: true,
     });
+
+    this.logger.log("User serialization completed");
 
     return serializedUser;
   }

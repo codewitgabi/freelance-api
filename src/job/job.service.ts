@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import { CreateJobDto } from "./dto/create-job.dto";
@@ -11,9 +12,13 @@ import { User } from "@prisma/client";
 
 @Injectable()
 export class JobService {
+  private readonly logger = new Logger(JobService.name, { timestamp: true });
+
   constructor(private prisma: PrismaService) {}
 
   async create(createJobDto: CreateJobDto, userId: number) {
+    this.logger.log("Begin creating job", { payload: createJobDto });
+
     const job = await this.prisma.job.create({
       data: {
         ...createJobDto,
@@ -21,10 +26,16 @@ export class JobService {
       },
     });
 
+    this.logger.log("Job creating completed");
+
     return job;
   }
 
   async findAll(paginationQuery: PaginationQueryDto) {
+    this.logger.log("Begin fetching all jobs with query", {
+      query: paginationQuery,
+    });
+
     const { page = 1, limit = 10 } = paginationQuery;
     const skip = (page - 1) * limit;
 
@@ -36,6 +47,14 @@ export class JobService {
 
     const total = await this.prisma.job.count();
 
+    this.logger.log("Jobs fetched successfully", {
+      payload: {
+        total,
+        page,
+        limit,
+      },
+    });
+
     return {
       results: jobs,
       total,
@@ -46,6 +65,8 @@ export class JobService {
   }
 
   async findOne(id: number) {
+    this.logger.log("Begin fetching job with id", { id });
+
     const job = await this.prisma.job.findFirst({
       where: { id },
       include: {
@@ -53,44 +74,85 @@ export class JobService {
       },
     });
 
+    if (!job) {
+      this.logger.log("Job with id not found", { id });
+
+      throw new NotFoundException("Job not found");
+    }
+
+    this.logger.log("Job with id retrieved and returned");
+
     return job;
   }
 
   async update(id: number, updateJobDto: UpdateJobDto, user: User) {
+    this.logger.log("Begin updating job", {
+      payload: updateJobDto,
+      id,
+      userId: user.id,
+    });
+
     // Get user with id
+
+    this.logger.log("Retrieving user with id", { id });
 
     const existingJob = await this.prisma.job.findFirst({ where: { id } });
 
     if (!existingJob) {
+      this.logger.log("Job not found for given id", { id });
+
       throw new NotFoundException("Job not found");
     }
 
+    this.logger.log("Job with id retrieved successfully");
+    this.logger.log("Checking if user has permission to update job");
+
     if (user.id !== existingJob.userId) {
+      this.logger.error("Permission denied; Current user cannot edit job");
+
       throw new ForbiddenException("Permission denied");
     }
+
+    this.logger.log("User has permission to update job");
 
     const job = await this.prisma.job.update({
       where: { id },
       data: updateJobDto,
     });
 
+    this.logger.log("Job updating completed");
+
     return job;
   }
 
   async delete(id: number, user: User) {
+    this.logger.log("Begin deleting job", { id, userId: user.id });
+
     // Get user with given id
+
+    this.logger.log("Retrieving user with id", { id });
 
     const job = await this.prisma.job.findFirst({ where: { id } });
 
     if (!job) {
+      this.logger.log("Job not found for given id", { id });
+
       throw new NotFoundException("Job not found");
     }
 
     // Check ownership
 
+    this.logger.log("Job with id retrieved successfully");
+    this.logger.log("Checking if user has permission to update job");
+
     if (user.id !== job.userId) {
+      this.logger.error("Permission denied; Current user cannot edit job");
+
       throw new ForbiddenException("Permission denied");
     }
+
+    this.logger.log("User has permission to update job");
+    this.logger.log("Job deletion completed");
 
     await this.prisma.job.delete({ where: { id } });
   }

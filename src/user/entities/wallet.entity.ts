@@ -7,7 +7,6 @@ export class WalletEntity {
 
   @Expose()
   @Transform(({ value }: { value: Decimal }) => {
-    console.log(value);
     return value ? value.toString() : "0.00";
   })
   balance: string;
