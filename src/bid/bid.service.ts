@@ -160,7 +160,7 @@ export class BidService {
     this.logger.log("Checking if bid with id exists");
 
     const bid = await this.prisma.bid.findUnique({
-      where: { id, userId: user.id },
+      where: { id },
     });
 
     if (!bid) {
@@ -170,6 +170,18 @@ export class BidService {
     }
 
     this.logger.log("Bid with id found");
+
+    // Check if user has permission to update bid
+
+    this.logger.log("Checking if user has permission to update bid");
+
+    if (bid.userId !== user.id) {
+      this.logger.error("User does not have the permission to update bid");
+
+      throw new ForbiddenException("Permission denied");
+    }
+
+    this.logger.log("User has permission to update bid");
 
     // Update bid
 
@@ -185,7 +197,41 @@ export class BidService {
     return updatedBid;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bid`;
+  async delete(id: number, user: User) {
+    this.logger.log("Begin bid deletion process", { id, userId: user.id });
+
+    // Check if bid exists
+
+    this.logger.log("Checking if bid exists");
+
+    const bid = await this.prisma.bid.findUnique({ where: { id } });
+
+    if (!bid) {
+      this.logger.error("Bid not found", { id });
+
+      throw new NotFoundException("Bid not found");
+    }
+
+    this.logger.log("Bid found");
+
+    // Check if user has permission to delete bid
+
+    this.logger.log("Checking if user has permission to delete bid");
+
+    if (bid.userId !== user.id) {
+      this.logger.error("User does not have the permission to delete bid");
+
+      throw new ForbiddenException("Permission denied");
+    }
+
+    this.logger.log("User has permission to delete bid");
+
+    // Delete bid
+
+    this.logger.log("Deleting bid");
+
+    await this.prisma.bid.delete({ where: { id } });
+
+    this.logger.log("Bid deletion process completed successfully");
   }
 }
