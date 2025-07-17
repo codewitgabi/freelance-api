@@ -6,6 +6,7 @@ import { JobModule } from "./job/job.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { CaslModule } from "./casl/casl.module";
 import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
+import { BidModule } from "./bid/bid.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
     JobModule,
     PrismaModule,
     CaslModule,
+    BidModule,
   ],
   controllers: [],
   providers: [],

@@ -23,11 +23,14 @@ import { PaginationQueryDto } from "src/common/pagination-query.dto";
 import { CaslAbilityFactory } from "src/casl/casl-ability.factory/casl-ability.factory";
 import { User } from "@prisma/client";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
+import { BidService } from "src/bid/bid.service";
+import { CreateBidDto } from "src/bid/dto/create-bid.dto";
 
 @Controller("jobs")
 export class JobController {
   constructor(
     private readonly jobService: JobService,
+    private readonly bidService: BidService,
     private caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
@@ -90,5 +93,19 @@ export class JobController {
     return SuccessResponse({
       message: "Job deleted successfully",
     });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.freelancer)
+  @Post(":id/bids")
+  async placeBid(
+    @Param("id") id: string,
+    @Body() createBidDto: CreateBidDto,
+    @CurrentUser() user: User,
+  ) {
+    const data = await this.bidService.create(createBidDto, +id, user);
+
+    return SuccessResponse({ message: "Bid placed successfully", data });
   }
 }
