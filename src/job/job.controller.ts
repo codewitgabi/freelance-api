@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseInterceptors,
 } from "@nestjs/common";
 import { JobService } from "./job.service";
 import { CreateJobDto } from "./dto/create-job.dto";
@@ -25,8 +26,10 @@ import { User } from "@prisma/client";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { BidService } from "src/bid/bid.service";
 import { CreateBidDto } from "src/bid/dto/create-bid.dto";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("jobs")
+@UseInterceptors(CacheInterceptor)
 export class JobController {
   constructor(
     private readonly jobService: JobService,

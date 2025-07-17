@@ -7,6 +7,7 @@ import { PrismaModule } from "./prisma/prisma.module";
 import { CaslModule } from "./casl/casl.module";
 import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
 import { BidModule } from "./bid/bid.module";
+import { CacheModule } from "@nestjs/cache-manager";
 
 @Module({
   imports: [
@@ -19,6 +20,9 @@ import { BidModule } from "./bid/bid.module";
     PrismaModule,
     CaslModule,
     BidModule,
+    CacheModule.register({
+      isGlobal: true,
+    }),
   ],
   controllers: [],
   providers: [],

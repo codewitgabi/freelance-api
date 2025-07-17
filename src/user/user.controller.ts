@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import SuccessResponse from "src/common/responses/success-response";
@@ -15,8 +16,10 @@ import { AuthGuard } from "src/common/guards/auth.guard";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { User } from "@prisma/client";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("users")
+@UseInterceptors(CacheInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
