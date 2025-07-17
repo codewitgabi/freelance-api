@@ -108,4 +108,14 @@ export class JobController {
 
     return SuccessResponse({ message: "Bid placed successfully", data });
   }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.client, Role.admin)
+  @Get(":id/bids")
+  async fetchBids(@Param("id") id: string, @CurrentUser() user: User) {
+    const data = await this.bidService.findAll(+id, user);
+
+    return SuccessResponse({ message: "Bids fetched successfully", data });
+  }
 }

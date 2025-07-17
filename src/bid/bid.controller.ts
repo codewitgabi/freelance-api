@@ -6,11 +6,6 @@ import { UpdateBidDto } from "./dto/update-bid.dto";
 export class BidController {
   constructor(private readonly bidService: BidService) {}
 
-  @Get()
-  findAll() {
-    return this.bidService.findAll();
-  }
-
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.bidService.findOne(+id);
