@@ -1,7 +1,20 @@
-import { Controller, Get, Body, Param, Delete } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Body,
+  Param,
+  Delete,
+  Patch,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from "@nestjs/common";
 import { UserService } from "./user.service";
-// import { UpdateUserDto } from "./dto/update-user.dto";
 import SuccessResponse from "src/common/responses/success-response";
+import { AuthGuard } from "src/common/guards/auth.guard";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { CurrentUser } from "src/common/decorators/current-user.decorator";
+import { User } from "@prisma/client";
 
 @Controller("users")
 export class UserController {
@@ -17,13 +30,24 @@ export class UserController {
     });
   }
 
-  // @Patch(":id")
-  // update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
+  @UseGuards(AuthGuard)
+  @Patch(":id")
+  async update(
+    @Param("id") id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: User,
+  ) {
+    const data = await this.userService.update(+id, updateUserDto, user);
 
+    return SuccessResponse({ message: "Profile updated successfully", data });
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthGuard)
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.userService.remove(+id);
+  async delete(@Param("id") id: string, @CurrentUser() user: User) {
+    await this.userService.delete(+id, user);
+
+    return SuccessResponse({ message: "Account deleted successfully" });
   }
 }
