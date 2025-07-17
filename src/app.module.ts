@@ -8,6 +8,7 @@ import { CaslModule } from "./casl/casl.module";
 import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
 import { BidModule } from "./bid/bid.module";
 import { CacheModule } from "@nestjs/cache-manager";
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CacheModule } from "@nestjs/cache-manager";
     CacheModule.register({
       isGlobal: true,
     }),
+    TransactionModule,
   ],
   controllers: [],
   providers: [],
