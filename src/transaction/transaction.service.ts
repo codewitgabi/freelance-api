@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+} from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreditWalletDto } from "./entities/credit-wallet.dto";
 import { User } from "@prisma/client";
@@ -127,5 +132,39 @@ export class TransactionService {
     this.logger.log("Transaction successful");
 
     return transaction;
+  }
+
+  async findAll(userId: number, user: User) {
+    this.logger.log("Begin getting all transactions for user", {
+      userId: userId,
+    });
+
+    // Check if user has permission to view this transactions
+
+    this.logger.log(
+      "Checking if user has permission to view this user's transactions",
+    );
+
+    if (userId !== user.id) {
+      this.logger.error(
+        "User does not have the permission to perform this action",
+      );
+
+      throw new ForbiddenException("Permission denied");
+    }
+
+    this.logger.log("User has permission to perform this action");
+
+    // Fetch transactions
+
+    this.logger.log("Fetching transactions");
+
+    const transactions = await this.prisma.transaction.findMany({
+      where: { userId: userId },
+    });
+
+    this.logger.log("Done fetching transactions");
+
+    return transactions;
   }
 }

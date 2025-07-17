@@ -17,11 +17,15 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { User } from "@prisma/client";
 import { CacheInterceptor } from "@nestjs/cache-manager";
+import { TransactionService } from "src/transaction/transaction.service";
 
 @Controller("users")
 @UseInterceptors(CacheInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly transactionService: TransactionService,
+  ) {}
 
   @Get(":id")
   async findOne(@Param("id") id: string) {
@@ -52,5 +56,16 @@ export class UserController {
     await this.userService.delete(+id, user);
 
     return SuccessResponse({ message: "Account deleted successfully" });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(":id/transactions")
+  async getTransactions(@Param("id") id: string, @CurrentUser() user: User) {
+    const data = await this.transactionService.findAll(+id, user);
+
+    return SuccessResponse({
+      message: "Transactions fetched successfully",
+      data,
+    });
   }
 }
