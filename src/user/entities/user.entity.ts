@@ -19,6 +19,9 @@ export class UserEntity {
   username: string;
 
   @Expose()
+  profilePic: string | null;
+
+  @Expose()
   createdAt: Date;
 
   @Expose()

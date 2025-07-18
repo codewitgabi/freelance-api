@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   UseInterceptors,
+  UploadedFile,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import SuccessResponse from "src/common/responses/success-response";
@@ -18,6 +19,10 @@ import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { User } from "@prisma/client";
 import { CacheInterceptor } from "@nestjs/cache-manager";
 import { TransactionService } from "src/transaction/transaction.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import "multer";
+import { Express } from "express";
+import { uploadToCloud } from "src/common/functions/file.upload";
 
 @Controller("users")
 @UseInterceptors(CacheInterceptor)
@@ -39,12 +44,25 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Patch(":id")
+  @UseInterceptors(FileInterceptor("profilePic"))
   async update(
     @Param("id") id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: User,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    const data = await this.userService.update(+id, updateUserDto, user);
+    let profilePic: string | undefined;
+
+    if (file) {
+      profilePic = await uploadToCloud(file);
+    }
+
+    const data = await this.userService.update(
+      +id,
+      updateUserDto,
+      user,
+      profilePic,
+    );
 
     return SuccessResponse({ message: "Profile updated successfully", data });
   }

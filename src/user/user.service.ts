@@ -60,7 +60,12 @@ export class UserService {
     return serializedUser;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto, user: User) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    user: User,
+    profilePic?: string,
+  ) {
     this.logger.log("Begin updating user profile", {
       payload: updateUserDto,
       id,
@@ -79,9 +84,15 @@ export class UserService {
 
     // Check if user with id exists
 
+    const data = { ...updateUserDto };
+
+    if (profilePic) {
+      data["profilePic"] = profilePic;
+    }
+
     const updatedUser = await this.prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data,
       include: {
         wallet: true,
       },

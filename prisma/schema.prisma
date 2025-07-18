@@ -37,6 +37,7 @@ model User {
   password     String
   firstName    String?       @db.VarChar(50)
   lastName     String?       @db.VarChar(50)
+  profilePic   String?
   role         Role          @default(freelancer)
   banned       Boolean       @default(false)
   createdAt    DateTime      @default(now())
